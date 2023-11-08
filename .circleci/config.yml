@@ -1,29 +1,26 @@
-version: 2.1
-setup: true
-orbs:
-  orb-tools: circleci/orb-tools@12.0
-  shellcheck: circleci/shellcheck@3.1
-  fastlane: ngs/fastlane@0.0.4
-  
-filters: &filters
-  tags:
-    only: /.*/
+# .circleci/config.yml
 
-workflows:
-  lint-pack:
-    jobs:
-      - orb-tools/lint:
-          filters: *filters
-      - orb-tools/pack:
-          filters: *filters
-      - orb-tools/review:
-          filters: *filters
-      - shellcheck/check:
-          filters: *filters
-      # Triggers the next workflow in the Orb Development Kit.
-      - orb-tools/continue:
-          pipeline_number: << pipeline.number >>
-          vcs_type: << pipeline.project.type >>
-          orb_name: <orb-name>
-          requires: [orb-tools/lint, orb-tools/pack, orb-tools/review, shellcheck/check]
-          filters: *filters
+version: 2.1
+
+orbs:
+  ruby: circleci/ruby@1.2.0
+
+jobs:
+  build:
+    macos:
+      xcode: "13.1.0"
+    working_directory: /Users/distiller/project
+    environment:
+      FL_OUTPUT_DIR: output
+      FASTLANE_LANE: test
+    shell: /bin/bash --login -o pipefail
+    steps:
+      - checkout
+      - ruby/install-deps
+      - run:
+          name: fastlane
+          command: bundle exec fastlane $FASTLANE_LANE
+      - store_artifacts:
+          path: output
+      - store_test_results:
+          path: output/scan
