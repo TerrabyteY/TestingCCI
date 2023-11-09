@@ -9,7 +9,6 @@ jobs:
   build:
     macos:
       xcode: "14.3.1"
-    working_directory: /Users/DiegoL/Desktop/iOS Workspace/TestingCLI/TestingCCI
     environment:
       FL_OUTPUT_DIR: output
     shell: /bin/bash --login -o pipefail
